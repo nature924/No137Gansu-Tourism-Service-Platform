@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiudianOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jiudian_order_uuid_number as jiudianOrderUuidNumber
+        ,a.jiudian_id as jiudianId
+        ,a.yonghu_id as yonghuId
+        ,a.buy_number as buyNumber
+        ,a.jiudian_order_time as jiudianOrderTime
+        ,a.jiudian_order_true_price as jiudianOrderTruePrice
+        ,a.jiudian_order_types as jiudianOrderTypes
+        ,a.jiudian_order_payment_types as jiudianOrderPaymentTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiudianOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,jiudian.shangjia_id as jiudianShangjiaId
+        ,jiudian.jiudian_name as jiudianName
+        ,jiudian.jiudian_uuid_number as jiudianUuidNumber
+        ,jiudian.jiudian_photo as jiudianPhoto
+        ,jiudian.jiudian_address as jiudianAddress
+        ,jiudian.jiudian_tese as jiudianTese
+        ,jiudian.zan_number as zanNumber
+        ,jiudian.cai_number as caiNumber
+        ,jiudian.jiudian_types as jiudianTypes
+        ,jiudian.jiudian_kucun_number as jiudianKucunNumber
+        ,jiudian.jiudian_old_money as jiudianOldMoney
+        ,jiudian.jiudian_new_money as jiudianNewMoney
+        ,jiudian.jiudian_clicknum as jiudianClicknum
+        ,jiudian.jiudian_content as jiudianContent
+        ,jiudian.shangxia_types as shangxiaTypes
+        ,jiudian.jiudian_delete as jiudianDelete
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM jiudian_order  a
+        left JOIN jiudian jiudian ON a.jiudian_id = jiudian.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.jiudianOrderUuidNumber != '' and params.jiudianOrderUuidNumber != null and params.jiudianOrderUuidNumber != 'null' ">
+                and a.jiudian_order_uuid_number like CONCAT('%',#{params.jiudianOrderUuidNumber},'%')
+            </if>
+            <if test="params.jiudianId != null and params.jiudianId != ''">
+                and (
+                    a.jiudian_id = #{params.jiudianId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.buyNumberStart != null and params.buyNumberStart != ''">
+                <![CDATA[  and a.buy_number >= #{params.buyNumberStart}   ]]>
+            </if>
+            <if test="params.buyNumberEnd != null and params.buyNumberEnd != ''">
+                <![CDATA[  and a.buy_number <= #{params.buyNumberEnd}   ]]>
+            </if>
+             <if test="params.buyNumber != null and params.buyNumber != ''">
+                and a.buy_number = #{params.buyNumber}
+             </if>
+            <if test=" params.jiudianOrderTimeStart != '' and params.jiudianOrderTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiudian_order_time) >= UNIX_TIMESTAMP(#{params.jiudianOrderTimeStart}) ]]>
+            </if>
+            <if test=" params.jiudianOrderTimeEnd != '' and params.jiudianOrderTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiudian_order_time) <= UNIX_TIMESTAMP(#{params.jiudianOrderTimeEnd}) ]]>
+            </if>
+            <if test="params.jiudianOrderTime != null and params.jiudianOrderTime != ''">
+                and a.jiudian_order_time = #{params.jiudianOrderTime}
+            </if>
+            <if test="params.jiudianOrderTruePriceStart != null ">
+                <![CDATA[  and a.jiudian_order_true_price >= #{params.jiudianOrderTruePriceStart}   ]]>
+            </if>
+            <if test="params.jiudianOrderTruePriceEnd != null ">
+                <![CDATA[  and a.jiudian_order_true_price <= #{params.jiudianOrderTruePriceEnd}   ]]>
+            </if>
+            <if test="params.jiudianOrderTruePrice != null and params.jiudianOrderTruePrice != ''">
+                and a.jiudian_order_true_price = #{params.jiudianOrderTruePrice}
+            </if>
+            <if test="params.jiudianOrderTypes != null and params.jiudianOrderTypes != ''">
+                and a.jiudian_order_types = #{params.jiudianOrderTypes}
+            </if>
+            <if test="params.jiudianOrderPaymentTypes != null and params.jiudianOrderPaymentTypes != ''">
+                and a.jiudian_order_payment_types = #{params.jiudianOrderPaymentTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断酒店的id不为空 -->
+            <if test=" params.jiudianIdNotNull != '' and params.jiudianIdNotNull != null and params.jiudianIdNotNull != 'null' ">
+                and a.jiudian_id IS NOT NULL
+            </if>
+            <if test="params.shangjiaId != null  and params.shangjiaId != ''">
+                and jiudian.shangjia_id = #{params.shangjiaId}
+            </if>
+            <if test=" params.jiudianName != '' and params.jiudianName != null and params.jiudianName != 'null' ">
+                and jiudian.jiudian_name like CONCAT('%',#{params.jiudianName},'%')
+            </if>
+            <if test=" params.jiudianUuidNumber != '' and params.jiudianUuidNumber != null and params.jiudianUuidNumber != 'null' ">
+                and jiudian.jiudian_uuid_number like CONCAT('%',#{params.jiudianUuidNumber},'%')
+            </if>
+            <if test=" params.jiudianAddress != '' and params.jiudianAddress != null and params.jiudianAddress != 'null' ">
+                and jiudian.jiudian_address like CONCAT('%',#{params.jiudianAddress},'%')
+            </if>
+            <if test=" params.jiudianTese != '' and params.jiudianTese != null and params.jiudianTese != 'null' ">
+                and jiudian.jiudian_tese like CONCAT('%',#{params.jiudianTese},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and jiudian.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and jiudian.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and jiudian.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and jiudian.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and jiudian.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and jiudian.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.jiudianTypes != null  and params.jiudianTypes != ''">
+                and jiudian.jiudian_types = #{params.jiudianTypes}
+            </if>
+
+            <if test="params.jiudianKucunNumberStart != null  and params.jiudianKucunNumberStart != '' ">
+                <![CDATA[  and jiudian.jiudian_kucun_number >= #{params.jiudianKucunNumberStart}   ]]>
+            </if>
+            <if test="params.jiudianKucunNumberEnd != null  and params.jiudianKucunNumberEnd != '' ">
+                <![CDATA[  and jiudian.jiudian_kucun_number <= #{params.jiudianKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.jiudianKucunNumber != null  and params.jiudianKucunNumber != '' ">
+                and jiudian.jiudian_kucun_number = #{params.jiudianKucunNumber}
+            </if>
+            <if test="params.jiudianOldMoneyStart != null ">
+                <![CDATA[  and jiudian.jiudian_old_money >= #{params.jiudianOldMoneyStart}   ]]>
+            </if>
+            <if test="params.jiudianOldMoneyEnd != null ">
+                <![CDATA[  and jiudian.jiudian_old_money <= #{params.jiudianOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.jiudianOldMoney != null and params.jiudianOldMoney != ''">
+                and a.jiudian_old_money = #{params.jiudianOldMoney}
+            </if>
+            <if test="params.jiudianNewMoneyStart != null ">
+                <![CDATA[  and jiudian.jiudian_new_money >= #{params.jiudianNewMoneyStart}   ]]>
+            </if>
+            <if test="params.jiudianNewMoneyEnd != null ">
+                <![CDATA[  and jiudian.jiudian_new_money <= #{params.jiudianNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.jiudianNewMoney != null and params.jiudianNewMoney != ''">
+                and a.jiudian_new_money = #{params.jiudianNewMoney}
+            </if>
+            <if test="params.jiudianClicknumStart != null  and params.jiudianClicknumStart != '' ">
+                <![CDATA[  and jiudian.jiudian_clicknum >= #{params.jiudianClicknumStart}   ]]>
+            </if>
+            <if test="params.jiudianClicknumEnd != null  and params.jiudianClicknumEnd != '' ">
+                <![CDATA[  and jiudian.jiudian_clicknum <= #{params.jiudianClicknumEnd}   ]]>
+            </if>
+            <if test="params.jiudianClicknum != null  and params.jiudianClicknum != '' ">
+                and jiudian.jiudian_clicknum = #{params.jiudianClicknum}
+            </if>
+            <if test=" params.jiudianContent != '' and params.jiudianContent != null and params.jiudianContent != 'null' ">
+                and jiudian.jiudian_content like CONCAT('%',#{params.jiudianContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and jiudian.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.jiudianDeleteStart != null  and params.jiudianDeleteStart != '' ">
+                <![CDATA[  and jiudian.jiudian_delete >= #{params.jiudianDeleteStart}   ]]>
+            </if>
+            <if test="params.jiudianDeleteEnd != null  and params.jiudianDeleteEnd != '' ">
+                <![CDATA[  and jiudian.jiudian_delete <= #{params.jiudianDeleteEnd}   ]]>
+            </if>
+            <if test="params.jiudianDelete != null  and params.jiudianDelete != '' ">
+                and jiudian.jiudian_delete = #{params.jiudianDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiudian.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiudian.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

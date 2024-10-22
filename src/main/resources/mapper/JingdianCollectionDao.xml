@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JingdianCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jingdian_id as jingdianId
+        ,a.yonghu_id as yonghuId
+        ,a.jingdian_collection_types as jingdianCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JingdianCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,jingdian.shangjia_id as jingdianShangjiaId
+        ,jingdian.jingdian_name as jingdianName
+        ,jingdian.jingdian_uuid_number as jingdianUuidNumber
+        ,jingdian.jingdian_photo as jingdianPhoto
+        ,jingdian.jingdian_video as jingdianVideo
+        ,jingdian.jingdian_address as jingdianAddress
+        ,jingdian.zan_number as zanNumber
+        ,jingdian.cai_number as caiNumber
+        ,jingdian.jingdian_types as jingdianTypes
+        ,jingdian.jingdian_kucun_number as jingdianKucunNumber
+        ,jingdian.jingdian_old_money as jingdianOldMoney
+        ,jingdian.jingdian_new_money as jingdianNewMoney
+        ,jingdian.jingdian_clicknum as jingdianClicknum
+        ,jingdian.jingdian_content as jingdianContent
+        ,jingdian.shangxia_types as shangxiaTypes
+        ,jingdian.jingdian_delete as jingdianDelete
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM jingdian_collection  a
+        left JOIN jingdian jingdian ON a.jingdian_id = jingdian.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.jingdianId != null and params.jingdianId != ''">
+                and (
+                    a.jingdian_id = #{params.jingdianId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.jingdianCollectionTypes != null and params.jingdianCollectionTypes != ''">
+                and a.jingdian_collection_types = #{params.jingdianCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断景点的id不为空 -->
+            <if test=" params.jingdianIdNotNull != '' and params.jingdianIdNotNull != null and params.jingdianIdNotNull != 'null' ">
+                and a.jingdian_id IS NOT NULL
+            </if>
+            <if test="params.shangjiaId != null  and params.shangjiaId != ''">
+                and jingdian.shangjia_id = #{params.shangjiaId}
+            </if>
+            <if test=" params.jingdianName != '' and params.jingdianName != null and params.jingdianName != 'null' ">
+                and jingdian.jingdian_name like CONCAT('%',#{params.jingdianName},'%')
+            </if>
+            <if test=" params.jingdianUuidNumber != '' and params.jingdianUuidNumber != null and params.jingdianUuidNumber != 'null' ">
+                and jingdian.jingdian_uuid_number like CONCAT('%',#{params.jingdianUuidNumber},'%')
+            </if>
+            <if test=" params.jingdianVideo != '' and params.jingdianVideo != null and params.jingdianVideo != 'null' ">
+                and jingdian.jingdian_video like CONCAT('%',#{params.jingdianVideo},'%')
+            </if>
+            <if test=" params.jingdianAddress != '' and params.jingdianAddress != null and params.jingdianAddress != 'null' ">
+                and jingdian.jingdian_address like CONCAT('%',#{params.jingdianAddress},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and jingdian.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and jingdian.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and jingdian.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and jingdian.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and jingdian.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and jingdian.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.jingdianTypes != null  and params.jingdianTypes != ''">
+                and jingdian.jingdian_types = #{params.jingdianTypes}
+            </if>
+
+            <if test="params.jingdianKucunNumberStart != null  and params.jingdianKucunNumberStart != '' ">
+                <![CDATA[  and jingdian.jingdian_kucun_number >= #{params.jingdianKucunNumberStart}   ]]>
+            </if>
+            <if test="params.jingdianKucunNumberEnd != null  and params.jingdianKucunNumberEnd != '' ">
+                <![CDATA[  and jingdian.jingdian_kucun_number <= #{params.jingdianKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.jingdianKucunNumber != null  and params.jingdianKucunNumber != '' ">
+                and jingdian.jingdian_kucun_number = #{params.jingdianKucunNumber}
+            </if>
+            <if test="params.jingdianOldMoneyStart != null ">
+                <![CDATA[  and jingdian.jingdian_old_money >= #{params.jingdianOldMoneyStart}   ]]>
+            </if>
+            <if test="params.jingdianOldMoneyEnd != null ">
+                <![CDATA[  and jingdian.jingdian_old_money <= #{params.jingdianOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.jingdianOldMoney != null and params.jingdianOldMoney != ''">
+                and a.jingdian_old_money = #{params.jingdianOldMoney}
+            </if>
+            <if test="params.jingdianNewMoneyStart != null ">
+                <![CDATA[  and jingdian.jingdian_new_money >= #{params.jingdianNewMoneyStart}   ]]>
+            </if>
+            <if test="params.jingdianNewMoneyEnd != null ">
+                <![CDATA[  and jingdian.jingdian_new_money <= #{params.jingdianNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.jingdianNewMoney != null and params.jingdianNewMoney != ''">
+                and a.jingdian_new_money = #{params.jingdianNewMoney}
+            </if>
+            <if test="params.jingdianClicknumStart != null  and params.jingdianClicknumStart != '' ">
+                <![CDATA[  and jingdian.jingdian_clicknum >= #{params.jingdianClicknumStart}   ]]>
+            </if>
+            <if test="params.jingdianClicknumEnd != null  and params.jingdianClicknumEnd != '' ">
+                <![CDATA[  and jingdian.jingdian_clicknum <= #{params.jingdianClicknumEnd}   ]]>
+            </if>
+            <if test="params.jingdianClicknum != null  and params.jingdianClicknum != '' ">
+                and jingdian.jingdian_clicknum = #{params.jingdianClicknum}
+            </if>
+            <if test=" params.jingdianContent != '' and params.jingdianContent != null and params.jingdianContent != 'null' ">
+                and jingdian.jingdian_content like CONCAT('%',#{params.jingdianContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and jingdian.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.jingdianDeleteStart != null  and params.jingdianDeleteStart != '' ">
+                <![CDATA[  and jingdian.jingdian_delete >= #{params.jingdianDeleteStart}   ]]>
+            </if>
+            <if test="params.jingdianDeleteEnd != null  and params.jingdianDeleteEnd != '' ">
+                <![CDATA[  and jingdian.jingdian_delete <= #{params.jingdianDeleteEnd}   ]]>
+            </if>
+            <if test="params.jingdianDelete != null  and params.jingdianDelete != '' ">
+                and jingdian.jingdian_delete = #{params.jingdianDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jingdian.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jingdian.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

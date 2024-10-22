@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.MeishiCommentbackDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.meishi_id as meishiId
+        ,a.yonghu_id as yonghuId
+        ,a.meishi_commentback_text as meishiCommentbackText
+        ,a.insert_time as insertTime
+        ,a.reply_text as replyText
+        ,a.update_time as updateTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.MeishiCommentbackView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,meishi.shangjia_id as meishiShangjiaId
+        ,meishi.meishi_name as meishiName
+        ,meishi.meishi_uuid_number as meishiUuidNumber
+        ,meishi.meishi_photo as meishiPhoto
+        ,meishi.zan_number as zanNumber
+        ,meishi.cai_number as caiNumber
+        ,meishi.meishi_types as meishiTypes
+        ,meishi.meishi_kucun_number as meishiKucunNumber
+        ,meishi.meishi_old_money as meishiOldMoney
+        ,meishi.meishi_new_money as meishiNewMoney
+        ,meishi.meishi_clicknum as meishiClicknum
+        ,meishi.meishi_content as meishiContent
+        ,meishi.shangxia_types as shangxiaTypes
+        ,meishi.meishi_delete as meishiDelete
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM meishi_commentback  a
+        left JOIN meishi meishi ON a.meishi_id = meishi.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.meishiId != null and params.meishiId != ''">
+                and (
+                    a.meishi_id = #{params.meishiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.meishiCommentbackText != '' and params.meishiCommentbackText != null and params.meishiCommentbackText != 'null' ">
+                and a.meishi_commentback_text like CONCAT('%',#{params.meishiCommentbackText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test=" params.replyText != '' and params.replyText != null and params.replyText != 'null' ">
+                and a.reply_text like CONCAT('%',#{params.replyText},'%')
+            </if>
+            <if test=" params.updateTimeStart != '' and params.updateTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) >= UNIX_TIMESTAMP(#{params.updateTimeStart}) ]]>
+            </if>
+            <if test=" params.updateTimeEnd != '' and params.updateTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) <= UNIX_TIMESTAMP(#{params.updateTimeEnd}) ]]>
+            </if>
+            <if test="params.updateTime != null and params.updateTime != ''">
+                and a.update_time = #{params.updateTime}
+            </if>
+
+                <!-- 判断美食的id不为空 -->
+            <if test=" params.meishiIdNotNull != '' and params.meishiIdNotNull != null and params.meishiIdNotNull != 'null' ">
+                and a.meishi_id IS NOT NULL
+            </if>
+            <if test="params.shangjiaId != null  and params.shangjiaId != ''">
+                and meishi.shangjia_id = #{params.shangjiaId}
+            </if>
+            <if test=" params.meishiName != '' and params.meishiName != null and params.meishiName != 'null' ">
+                and meishi.meishi_name like CONCAT('%',#{params.meishiName},'%')
+            </if>
+            <if test=" params.meishiUuidNumber != '' and params.meishiUuidNumber != null and params.meishiUuidNumber != 'null' ">
+                and meishi.meishi_uuid_number like CONCAT('%',#{params.meishiUuidNumber},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and meishi.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and meishi.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and meishi.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and meishi.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and meishi.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and meishi.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.meishiTypes != null  and params.meishiTypes != ''">
+                and meishi.meishi_types = #{params.meishiTypes}
+            </if>
+
+            <if test="params.meishiKucunNumberStart != null  and params.meishiKucunNumberStart != '' ">
+                <![CDATA[  and meishi.meishi_kucun_number >= #{params.meishiKucunNumberStart}   ]]>
+            </if>
+            <if test="params.meishiKucunNumberEnd != null  and params.meishiKucunNumberEnd != '' ">
+                <![CDATA[  and meishi.meishi_kucun_number <= #{params.meishiKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.meishiKucunNumber != null  and params.meishiKucunNumber != '' ">
+                and meishi.meishi_kucun_number = #{params.meishiKucunNumber}
+            </if>
+            <if test="params.meishiOldMoneyStart != null ">
+                <![CDATA[  and meishi.meishi_old_money >= #{params.meishiOldMoneyStart}   ]]>
+            </if>
+            <if test="params.meishiOldMoneyEnd != null ">
+                <![CDATA[  and meishi.meishi_old_money <= #{params.meishiOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.meishiOldMoney != null and params.meishiOldMoney != ''">
+                and a.meishi_old_money = #{params.meishiOldMoney}
+            </if>
+            <if test="params.meishiNewMoneyStart != null ">
+                <![CDATA[  and meishi.meishi_new_money >= #{params.meishiNewMoneyStart}   ]]>
+            </if>
+            <if test="params.meishiNewMoneyEnd != null ">
+                <![CDATA[  and meishi.meishi_new_money <= #{params.meishiNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.meishiNewMoney != null and params.meishiNewMoney != ''">
+                and a.meishi_new_money = #{params.meishiNewMoney}
+            </if>
+            <if test="params.meishiClicknumStart != null  and params.meishiClicknumStart != '' ">
+                <![CDATA[  and meishi.meishi_clicknum >= #{params.meishiClicknumStart}   ]]>
+            </if>
+            <if test="params.meishiClicknumEnd != null  and params.meishiClicknumEnd != '' ">
+                <![CDATA[  and meishi.meishi_clicknum <= #{params.meishiClicknumEnd}   ]]>
+            </if>
+            <if test="params.meishiClicknum != null  and params.meishiClicknum != '' ">
+                and meishi.meishi_clicknum = #{params.meishiClicknum}
+            </if>
+            <if test=" params.meishiContent != '' and params.meishiContent != null and params.meishiContent != 'null' ">
+                and meishi.meishi_content like CONCAT('%',#{params.meishiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and meishi.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.meishiDeleteStart != null  and params.meishiDeleteStart != '' ">
+                <![CDATA[  and meishi.meishi_delete >= #{params.meishiDeleteStart}   ]]>
+            </if>
+            <if test="params.meishiDeleteEnd != null  and params.meishiDeleteEnd != '' ">
+                <![CDATA[  and meishi.meishi_delete <= #{params.meishiDeleteEnd}   ]]>
+            </if>
+            <if test="params.meishiDelete != null  and params.meishiDelete != '' ">
+                and meishi.meishi_delete = #{params.meishiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(meishi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(meishi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
